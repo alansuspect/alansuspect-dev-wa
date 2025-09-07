@@ -1,9 +1,22 @@
 
 <div reversed class=" wa-grid" style="--postlist-index: {{ (postslistCounter or postslist.length) + 1 }}">
 {% for post in postslist | reverse %}
-	<wa-card class="card-basic">
-			{{ post.data.title }}
-			{{ post.content | safe }}
-	</wa-card>
+<wa-card class="card-header">
+  <div slot="header" class="wa-split">
+		{{ post.data.title }}
+  </div>
+
+		{{ post.content | safe }}
+</wa-card>
 {% endfor %}
 </div>
+
+<style>
+  .card-header {
+    max-width: 300px;
+  }
+
+  .card-header h3 {
+    margin: 0;
+  }
+</style>
