@@ -1,14 +1,9 @@
 
-<ul reversed class="postlist" style="--postlist-index: {{ (postslistCounter or postslist.length) + 1 }}">
+<div reversed class=" wa-grid" style="--postlist-index: {{ (postslistCounter or postslist.length) + 1 }}">
 {% for post in postslist | reverse %}
-	<li class="postlist-item post-container{% if post.url == url %} postlist-item-active{% endif %}">
-		<div class="postlist-meta">
-			<a href="{{ post.url }}" class="postlist-link">{% if post.data.title %}{{ post.data.title }}{% else %}<code>{{ post.url }}</code>{% endif %}</a>
-			<time class="postlist-date" datetime="{{ post.date | htmlDateString }}">{{ post.date | readableDate }}</time>
-		</div>
-		<div class="postlist-content">
+	<wa-card class="card-basic">
+			{{ post.data.title }}
 			{{ post.content | safe }}
-		</div>
-	</li>
+	</wa-card>
 {% endfor %}
-</ul>
+</div>
