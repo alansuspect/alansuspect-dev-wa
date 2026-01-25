@@ -1,0 +1,54 @@
+---
+pagination:
+  data: books.books
+  size: 12
+permalink: books/{% if pagination.pageNumber %}page-{{ pagination.pageNumber + 1 }}/{% endif %}index.html
+eleventyNavigation:
+  key: Books
+  order: 6
+---
+
+<h1>My Books</h1>
+
+<ul class="book-list">
+{% for book in pagination.items %}
+    <li class="book-item">
+        {% if book.cover.url %}
+            <img src="{{ book.cover.url }}" width="300" alt="Cover of {{ book.title }}" />
+        {% else %}
+            <div class="no-cover">No Cover Available</div>
+        {% endif %}
+        <h4><a href="{{ book.id }}" target="_blank">{{ book.title }}</a></h4>
+        <h5>{{ book.authorNames }}</h5>
+        <p>
+            {% set publisher = book.publishers.join(', ') if (book.publishers and book.publishers.length > 0) else none %}
+            {% set pubDate = book.publishedDate or none %}
+            {% if publisher and pubDate %}
+                {{ publisher }}, {{ pubDate }}
+            {% elif publisher %}
+                {{ publisher }}
+            {% elif pubDate %}
+                {{ pubDate }}
+            {% endif %}
+            <br />
+            {% if book.openlibraryKey  %}
+                <a href="https://openlibrary.org/books/{{ book.openlibraryKey }}" target="_blank">OpenLibrary</a>
+            {% endif %}
+        </p>
+    </li>
+{% endfor %}
+</ul>
+
+<nav class="pagination">
+    {% if pagination.previousPageHref %}
+        <a href="{{ pagination.previousPageHref }}" class="pagination-prev">← Previous</a>
+    {% endif %}
+    
+    <span class="pagination-info">
+        Page {{ pagination.pageNumber + 1 }} of {{ pagination.pages.length }}
+    </span>
+    
+    {% if pagination.nextPageHref %}
+        <a href="{{ pagination.nextPageHref }}" class="pagination-next">Next →</a>
+    {% endif %}
+</nav>

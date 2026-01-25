@@ -347,3 +347,48 @@ blockquote {
 
 
 
+
+  /* Books */
+
+ul.book-list {
+	list-style: none;
+	display: grid;
+	grid-template-columns: repeat(3, minmax(0, 1fr));
+	gap: 4rem;
+}
+
+ul.book-list h3, 
+ul.book-list h4,
+ul.book-list h5 {
+    margin-bottom: 0;
+}
+
+
+ul.book-list li {
+    display: flex;
+    flex-flow: column;
+    gap: 1rem;
+}
+
+
+ul.book-list img,
+ul.book-list picture img {
+    max-width: 100px;
+}
+
+ul.book-list p {
+	margin: 0;
+	font-size: 0.9rem;
+}
+
+ul.book-list .no-cover {
+	width: 100px;
+	height: 150px;
+	background-color: var(--color-gray-50);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	font-size: 0.8rem;
+	color: var(--color-gray-20);
+	text-align: center;
+}
