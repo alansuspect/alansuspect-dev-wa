@@ -357,6 +357,12 @@ ul.book-list {
 	gap: 4rem;
 }
 
+@media screen and (max-width: 600px) {
+ul.book-list {
+	grid-template-columns: 1fr;
+}
+}
+
 ul.book-list h3, 
 ul.book-list h4,
 ul.book-list h5 {
