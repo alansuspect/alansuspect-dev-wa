@@ -52,6 +52,17 @@ Now we have a place to put our book data once we've fetched it. Then we have a f
 
 ```
 for (let page = 1; page <= totalPages; page++) {
+        const pageUrl = `${baseUrl}.json?page=${page}`;
+        const response = await fetch(pageUrl);
+        if (!response.ok) {
+            throw new Error(`Error fetching page ${page}: ${response.statusText}`);
+        }
+
+        const data = await response.json();
+        if (data.orderedItems) {
+            books.push(...data.orderedItems);
+        }
+    }
 ```
 
 And finally return the data with a sort of latest:
@@ -70,10 +81,90 @@ Below are the full files in case you want to try it yourself, and if you make an
 
 ```
 import fetch from 'node-fetch';
+
+const fetchBooks = async () => {
+    const baseUrl = 'https://books.alansuspect.dev/user/read/books/read';
+    const shelfUrl = `${baseUrl}.json`;
+
+    const shelfResponse = await fetch(shelfUrl);
+    if (!shelfResponse.ok) {
+        throw new Error(`Failed to fetch shelf data: ${shelfResponse.statusText}`);
+    }
+
+    const shelfData = await shelfResponse.json();
+    const totalPages = new URL(shelfData.last).searchParams.get('page');
+    const books = [];
+
+    for (let page = 1; page <= totalPages; page++) {
+        const pageUrl = `${baseUrl}.json?page=${page}`;
+        const response = await fetch(pageUrl);
+        if (!response.ok) {
+            throw new Error(`Error fetching page ${page}: ${response.statusText}`);
+        }
+
+        const data = await response.json();
+        if (data.orderedItems) {
+            books.push(...data.orderedItems);
+        }
+    }
+
+    // Sort books by published date (most recent first)
+    return books.sort((a, b) => new Date(b.publishedDate) - new Date(a.publishedDate));
+};
+
+export default fetchBooks;
 ```
 
 ### \_data/books.js
 
 ```
 import fetchBooks from '../fetchBooks.js';
+import fetch from 'node-fetch';
+
+const fetchAuthorName = async (authorUrl) => {
+    try {
+        const response = await fetch(`${authorUrl}.json`);
+        if (!response.ok) {
+            throw new Error(`Failed to fetch author: ${response.statusText}`);
+        }
+        const authorData = await response.json();
+        return authorData.name || 'Unknown Author';
+    } catch (error) {
+        console.error(`Error fetching author ${authorUrl}:`, error);
+        return 'Unknown Author';
+    }
+};
+
+export default async () => {
+    try {
+        const books = await fetchBooks();
+        // console.log('Fetched books:', books);
+        
+        const processedBooks = await Promise.all(
+            books.map(async (book) => {
+                let authorNames = 'Unknown Author';
+                
+                if (book.authors && book.authors.length > 0) {
+                    const authorPromises = book.authors.map(authorUrl => fetchAuthorName(authorUrl));
+                    const names = await Promise.all(authorPromises);
+                    authorNames = names.join(', ');
+                }
+                
+                return {
+                    ...book,
+                    authorNames
+                };
+            })
+        );
+
+        return {
+            books: processedBooks || []
+        };
+    } catch (error) {
+        console.error('Error fetching books:', error);
+        return {
+            books: []
+        };
+    }
+};
 ```
